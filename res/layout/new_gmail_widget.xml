@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/layout"
+  android:layout_width="72dp"
+  android:layout_height="72dp"
+  >
+  <ImageView
+    android:id="@+id/widget_icon"
+    android:layout_width="fill_parent"
+    android:layout_height="55dp"
+    android:src="@drawable/icon"
+    />
+  <TextView
+    android:text="Gmail"
+    android:layout_below="@+id/widget_icon"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:background="#99080808"    
+    android:textColor="#FFFFFF"
+    android:textSize="20px"
+  />
+</RelativeLayout>
