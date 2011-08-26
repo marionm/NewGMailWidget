@@ -12,10 +12,13 @@ public final class R {
     }
     public static final class drawable {
         public static final int icon=0x7f020000;
+        public static final int rounded_rectangle=0x7f020001;
     }
     public static final class id {
-        public static final int layout=0x7f060000;
-        public static final int widget_icon=0x7f060001;
+        public static final int icon_layout=0x7f060001;
+        public static final int label=0x7f060003;
+        public static final int label_layout=0x7f060002;
+        public static final int widget_layout=0x7f060000;
     }
     public static final class layout {
         public static final int new_gmail_widget=0x7f030000;
