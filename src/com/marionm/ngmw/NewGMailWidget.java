@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-public class NewMailWidget extends AppWidgetProvider {
+public class NewGMailWidget extends AppWidgetProvider {
 
   //TODO: How to launch into the account selection menu?
   //      Maybe it happens automatically when multiple accounts have new messages?
