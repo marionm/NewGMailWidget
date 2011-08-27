@@ -4,6 +4,8 @@
 Purposely ignoring Android team's advice to not make widgets look like shortcuts (sorry, guys, nothing personal).
 Styling taken from here: http://kmansoft.wordpress.com/2010/04/20/making-a-launcher-shortcut-like-widget/
 Looks like the HTC shortcut theme, which will have to do for now.
+
+TODO: Needs a slight amount of tweaking, text is a tad too low and box is slightly off-color
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
