@@ -17,5 +17,10 @@
 	        android:resource="@xml/new_gmail_widget_provider_info"
 	      />
     </receiver>
+    <activity android:name=".NewGMailWidgetConfigure">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+      </intent-filter>
+    </activity>
   </application>
 </manifest>
