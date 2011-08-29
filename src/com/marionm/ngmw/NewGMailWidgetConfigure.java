@@ -24,15 +24,14 @@ public class NewGMailWidgetConfigure extends Activity {
     
     //Verify the presence of the Gmail app
     if(getPackageManager().resolveActivity(NewGMailWidgetHelper.getGmailIntent(), 0) == null) {
-      //FIXME: This may not work, perhaps just a custom view will do instead, check it out
-      AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-      alertBuilder.setMessage("Gmail app not found!");
-      alertBuilder.setNeutralButton("Close", new DialogInterface.OnClickListener() {
+      AlertDialog.Builder alert = new AlertDialog.Builder(this);
+      alert.setMessage("Gmail app not found!");
+      alert.setNeutralButton("Close", new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
           cancel();
         }
       });
-      alertBuilder.show();
+      alert.show();
     } else {
       Button cancelButton = (Button)findViewById(R.id.config_cancel_btn);
       cancelButton.setOnClickListener(new View.OnClickListener() {
