@@ -8,10 +8,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.RemoteViews;
 
 //TODO: Probably want to expose the configuration separately as well, not just on 'widget add'
 public class NewGMailWidgetConfigure extends Activity {
+  private static int NUM_ACCOUNTS = 5;
+
   private int widgetId;
   private NewGMailWidgetConfigure context;
 
@@ -26,6 +32,19 @@ public class NewGMailWidgetConfigure extends Activity {
     setContentView(R.layout.new_gmail_widget_configure);
 
     if(gmailAppMissing()) return;
+
+    String[] accountListItems = new String[NUM_ACCOUNTS];
+    for(int i = 0; i < NUM_ACCOUNTS; i++) {
+      accountListItems[i] = "Account " + (i + 1);
+    }
+    ArrayAdapter<String> accountListItemAdapter = new ArrayAdapter<String>(context, R.id.configuration_list);
+    ListView configurationList = (ListView)findViewById(R.id.configuration_list);
+    configurationList.setAdapter(accountListItemAdapter);
+
+    configurationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      }
+    });
 
     Button cancelButton = (Button)findViewById(R.id.config_cancel_btn);
     cancelButton.setOnClickListener(new View.OnClickListener() {
