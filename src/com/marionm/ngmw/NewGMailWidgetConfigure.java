@@ -1,6 +1,8 @@
 package com.marionm.ngmw;
 
 import static com.marionm.ngmw.NewGMailWidgetHelper.getGmailIntent;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -73,6 +75,15 @@ public class NewGMailWidgetConfigure extends Activity {
     } else {
       return false;
     }
+  }
+
+  private Account[] getGmailAccounts() {
+    AccountManager accountManager = AccountManager.get(context);
+    Account[] accounts = accountManager.getAccountsByType("com.google");
+    if(accounts.length == 0) {
+      fail("No Gmail accounts found!");
+    }
+    return accounts;
   }
 
   private void fail(String message) {
