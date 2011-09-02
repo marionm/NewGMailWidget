@@ -1,6 +1,10 @@
 package com.marionm.ngmw;
 
 import static com.marionm.ngmw.NewGMailWidgetHelper.getGmailIntent;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -23,6 +27,10 @@ public class NewGMailWidgetConfigure extends Activity {
   private int widgetId;
   private NewGMailWidgetConfigure context;
 
+  private Account[] accounts;
+  private String[] accountAddresses;
+  private Map<Integer, Integer> selectedAccounts;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -34,17 +42,28 @@ public class NewGMailWidgetConfigure extends Activity {
     setContentView(R.layout.new_gmail_widget_configure);
 
     if(gmailAppMissing()) return;
+    populateGmailAccounts();
 
-    String[] accountListItems = new String[NUM_ACCOUNTS];
-    for(int i = 0; i < NUM_ACCOUNTS; i++) {
-      accountListItems[i] = "Account " + (i + 1);
-    }
-    ArrayAdapter<String> accountListItemAdapter = new ArrayAdapter<String>(context, R.id.configuration_list);
+    //TODO: If this activity can be launched later, need to read this from something
+    selectedAccounts = new HashMap<Integer, Integer>();
+
     ListView configurationList = (ListView)findViewById(R.id.configuration_list);
-    configurationList.setAdapter(accountListItemAdapter);
+    populateConfigurationList(configurationList);
 
     configurationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        Integer accountIndex = selectedAccounts.get(position);
+        if(accountIndex == null) accountIndex = -1;
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setTitle("Accounts");
+        dialog.setSingleChoiceItems(accountAddresses, accountIndex, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            selectedAccounts.put(position, which);
+            dialog.dismiss();
+          }
+        });
+        dialog.show();
       }
     });
 
@@ -77,13 +96,26 @@ public class NewGMailWidgetConfigure extends Activity {
     }
   }
 
-  private Account[] getGmailAccounts() {
+  private void populateGmailAccounts() {
     AccountManager accountManager = AccountManager.get(context);
-    Account[] accounts = accountManager.getAccountsByType("com.google");
+    accounts = accountManager.getAccountsByType("com.google");
     if(accounts.length == 0) {
       fail("No Gmail accounts found!");
     }
-    return accounts;
+
+    accountAddresses = new String[accounts.length];
+    for(int i = 0; i < accounts.length; i++) {
+      accountAddresses[i] = accounts[i].name;
+    }
+  }
+
+  private void populateConfigurationList(ListView configurationList) {
+    String[] accountListArray = new String[NUM_ACCOUNTS];
+    for(int i = 0; i < NUM_ACCOUNTS; i++) {
+      accountListArray[i] = "Account " + (i + 1);
+    }
+    ArrayAdapter<String> accountListAdapter = new ArrayAdapter<String>(context, R.layout.configuration_list_item, accountListArray);
+    configurationList.setAdapter(accountListAdapter);
   }
 
   private void fail(String message) {
