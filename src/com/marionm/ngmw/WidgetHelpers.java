@@ -2,7 +2,7 @@ package com.marionm.ngmw;
 
 import android.content.Intent;
 
-public class NewGMailWidgetHelper {
+public class WidgetHelpers {
   //TODO: How to launch into the account selection menu?
   //      Maybe it happens automatically when multiple accounts have new messages?
   //      If not, try using some reflection to figure out what's available

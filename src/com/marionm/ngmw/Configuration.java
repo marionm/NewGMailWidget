@@ -1,6 +1,6 @@
 package com.marionm.ngmw;
 
-import static com.marionm.ngmw.NewGMailWidgetHelper.getGmailIntent;
+import static com.marionm.ngmw.WidgetHelpers.getGmailIntent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +21,11 @@ import android.widget.ListView;
 import android.widget.RemoteViews;
 
 //TODO: Probably want to expose the configuration separately as well, not just on 'widget add'
-public class NewGMailWidgetConfigure extends Activity {
+public class Configuration extends Activity {
   private static int NUM_ACCOUNTS = 5;
 
   private int widgetId;
-  private NewGMailWidgetConfigure context;
+  private Configuration context;
 
   private Account[] accounts;
   private String[] accountAddresses;
@@ -39,7 +39,7 @@ public class NewGMailWidgetConfigure extends Activity {
     Bundle extras = getIntent().getExtras();
     widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 
-    setContentView(R.layout.new_gmail_widget_configure);
+    setContentView(R.layout.configuration);
 
     if(gmailAppMissing()) return;
     populateGmailAccounts();
@@ -47,7 +47,7 @@ public class NewGMailWidgetConfigure extends Activity {
     //TODO: If this activity can be launched later, need to read this from something
     selectedAccounts = new HashMap<Integer, Integer>();
 
-    ListView configurationList = (ListView)findViewById(R.id.configuration_list);
+    ListView configurationList = (ListView)findViewById(R.id.config_list);
     populateConfigurationList(configurationList);
 
     configurationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

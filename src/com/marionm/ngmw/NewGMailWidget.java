@@ -13,7 +13,7 @@ public class NewGMailWidget extends AppWidgetProvider {
     super.onUpdate(context, appWidgetManager, appWidgetIds);
 
     for(int widgetId : appWidgetIds) {
-      PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, NewGMailWidgetHelper.getGmailIntent(), 0);
+      PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, WidgetHelpers.getGmailIntent(), 0);
       RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_gmail_widget);
       views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 

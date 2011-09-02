@@ -19,7 +19,7 @@
 	      />
     </receiver>
 
-    <activity android:name=".NewGMailWidgetConfigure">
+    <activity android:name=".Configuration">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
       </intent-filter>
