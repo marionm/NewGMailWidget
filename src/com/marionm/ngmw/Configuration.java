@@ -59,6 +59,8 @@ public class Configuration extends Activity {
         dialog.setTitle("Accounts");
         dialog.setSingleChoiceItems(accountAddresses, accountIndex, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
+            //TODO: Should actually select the radio button visually on click
+            //TODO: Should update the config list to show the selected address
             selectedAccounts.put(position, which);
             dialog.dismiss();
           }
