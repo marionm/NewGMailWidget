@@ -2,7 +2,6 @@ package com.marionm.ngmw;
 
 import static com.marionm.ngmw.WidgetHelpers.getGmailIntent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.accounts.Account;
@@ -12,6 +11,8 @@ import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,13 +24,13 @@ import android.widget.RemoteViews;
 //TODO: Probably want to expose the configuration separately as well, not just on 'widget add'
 public class Configuration extends Activity {
   private static int NUM_ACCOUNTS = 5;
+  private static String PREFS = "com.marionm.ngmw.SHAREDPREFS";
 
   private int widgetId;
   private Configuration context;
 
   private Account[] accounts;
   private String[] accountAddresses;
-  private Map<Integer, Integer> selectedAccounts;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -48,24 +49,35 @@ public class Configuration extends Activity {
     if(gmailAppMissing()) return;
     populateGmailAccounts();
 
-    //TODO: If this activity can be launched later, need to read this from something
-    selectedAccounts = new HashMap<Integer, Integer>();
-
     ListView configurationList = (ListView)findViewById(R.id.config_list);
     populateConfigurationList(configurationList);
 
     configurationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-        Integer accountIndex = selectedAccounts.get(position);
-        if(accountIndex == null) accountIndex = -1;
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final SharedPreferences sharedPreferences = getSharedPreferences(PREFS, 0);
+        Map<String, ?> preferences = sharedPreferences.getAll();
+
+        final String slotId = "slot" + position;
+        String slotSelection = (String)preferences.get(slotId);
+        int slotSelectionIndex = 0;
+        if(slotSelection != null) {
+          for(int i = 0; i < accountAddresses.length; i++) {
+            if(slotSelection.equals(accountAddresses[i])) {
+              slotSelectionIndex = i;
+              break;
+            }
+          }
+        }
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        dialog.setTitle("Accounts");
-        dialog.setSingleChoiceItems(accountAddresses, accountIndex, new DialogInterface.OnClickListener() {
+        dialog.setTitle("Tracked account " + position);
+        dialog.setSingleChoiceItems(accountAddresses, slotSelectionIndex, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
             //TODO: Should actually select the radio button visually on click
             //TODO: Should update the config list to show the selected address
-            selectedAccounts.put(position, which);
+            Editor editor = sharedPreferences.edit();
+            editor.putString(slotId, accountAddresses[which]);
+            editor.commit();
             dialog.dismiss();
           }
         });
@@ -109,9 +121,10 @@ public class Configuration extends Activity {
       fail("No Gmail accounts found!");
     }
 
-    accountAddresses = new String[accounts.length];
-    for(int i = 0; i < accounts.length; i++) {
-      accountAddresses[i] = accounts[i].name;
+    accountAddresses = new String[accounts.length + 1];
+    accountAddresses[0] = "None";
+    for(int i = 1; i <= accounts.length; i++) {
+      accountAddresses[i] = accounts[i - 1].name;
     }
   }
 
