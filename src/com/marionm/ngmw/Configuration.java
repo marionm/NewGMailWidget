@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -82,10 +84,9 @@ public class Configuration extends Activity {
         }
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        dialog.setTitle("Tracked account " + position);
+        dialog.setTitle("Tracked account " + (position + 1));
         dialog.setSingleChoiceItems(accountAddresses, slotSelectionIndex, new DialogInterface.OnClickListener() {
-          //TODO: How to get this to actually change the selected radio button visually immediately?
-          public void onClick(DialogInterface dialog, int which) {
+          public void onClick(final DialogInterface dialog, int which) {
             String selectedAddress = accountAddresses[which];
 
             Editor editor = sharedPreferences.edit();
@@ -95,7 +96,13 @@ public class Configuration extends Activity {
             configurationArray[position] = accountSlotText(position, selectedAddress);
             configurationAdapter.notifyDataSetChanged();
 
-            dialog.dismiss();
+            //Let this method return before dismissing, so that the radio buttons refresh
+            new Handler(new Handler.Callback() {
+              public boolean handleMessage(Message msg) {
+                dialog.dismiss();
+                return true;
+              }
+            }).sendEmptyMessage(0);
           }
         });
         dialog.show();
