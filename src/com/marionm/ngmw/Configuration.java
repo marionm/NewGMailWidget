@@ -38,6 +38,10 @@ public class Configuration extends Activity {
 
     Bundle extras = getIntent().getExtras();
     widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+    if(widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+      cancel();
+      return;
+    }
 
     setContentView(R.layout.configuration);
 
