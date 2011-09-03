@@ -23,8 +23,9 @@ import android.widget.RemoteViews;
 
 //TODO: Probably want to expose the configuration separately as well, not just on 'widget add'
 public class Configuration extends Activity {
-  private static int NUM_ACCOUNTS = 5;
+  private static int NUM_ACCOUNTS = 4;
   private static String PREFS = "com.marionm.ngmw.SHAREDPREFS";
+  private static String NO_ACCOUNT = "None";
 
   private int widgetId;
   private Configuration context;
@@ -50,14 +51,25 @@ public class Configuration extends Activity {
     populateGmailAccounts();
 
     ListView configurationList = (ListView)findViewById(R.id.config_list);
-    populateConfigurationList(configurationList);
 
+    final SharedPreferences sharedPreferences = getSharedPreferences(PREFS, 0);
+    Map<String, ?> preferences = sharedPreferences.getAll();
+
+    //Populate the configuration list with options
+    final String[] configurationArray = new String[NUM_ACCOUNTS];
+    for(int i = 0; i < NUM_ACCOUNTS; i++) {
+      configurationArray[i] = "Account " + (i + 1);
+      configurationArray[i] = accountSlotText(i, (String)preferences.get(slotKey(i)));
+    }
+    final ArrayAdapter<String> configurationAdapter = new ArrayAdapter<String>(context, R.layout.configuration_list_item, configurationArray);
+    configurationList.setAdapter(configurationAdapter);
+
+    //Handle click events
     configurationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final SharedPreferences sharedPreferences = getSharedPreferences(PREFS, 0);
+      public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
         Map<String, ?> preferences = sharedPreferences.getAll();
 
-        final String slotId = "slot" + position;
+        final String slotId = slotKey(position);
         String slotSelection = (String)preferences.get(slotId);
         int slotSelectionIndex = 0;
         if(slotSelection != null) {
@@ -72,12 +84,17 @@ public class Configuration extends Activity {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle("Tracked account " + position);
         dialog.setSingleChoiceItems(accountAddresses, slotSelectionIndex, new DialogInterface.OnClickListener() {
+          //TODO: How to get this to actually change the selected radio button visually immediately?
           public void onClick(DialogInterface dialog, int which) {
-            //TODO: Should actually select the radio button visually on click
-            //TODO: Should update the config list to show the selected address
+            String selectedAddress = accountAddresses[which];
+
             Editor editor = sharedPreferences.edit();
-            editor.putString(slotId, accountAddresses[which]);
+            editor.putString(slotId, selectedAddress);
             editor.commit();
+
+            configurationArray[position] = accountSlotText(position, selectedAddress);
+            configurationAdapter.notifyDataSetChanged();
+
             dialog.dismiss();
           }
         });
@@ -105,6 +122,8 @@ public class Configuration extends Activity {
     });
   }
 
+
+
   private boolean gmailAppMissing() {
     if(getPackageManager().resolveActivity(getGmailIntent(), 0) == null) {
       fail("Gmail app not found!");
@@ -122,20 +141,27 @@ public class Configuration extends Activity {
     }
 
     accountAddresses = new String[accounts.length + 1];
-    accountAddresses[0] = "None";
+    accountAddresses[0] = NO_ACCOUNT;
     for(int i = 1; i <= accounts.length; i++) {
       accountAddresses[i] = accounts[i - 1].name;
     }
   }
 
-  private void populateConfigurationList(ListView configurationList) {
-    String[] accountListArray = new String[NUM_ACCOUNTS];
-    for(int i = 0; i < NUM_ACCOUNTS; i++) {
-      accountListArray[i] = "Account " + (i + 1);
-    }
-    ArrayAdapter<String> accountListAdapter = new ArrayAdapter<String>(context, R.layout.configuration_list_item, accountListArray);
-    configurationList.setAdapter(accountListAdapter);
+
+
+  private String slotKey(int slot) {
+    return "slot" + slot;
   }
+
+  private String accountSlotText(int slot, String address) {
+    String text = "Account " + (slot + 1);
+    if(address != null && !address.equals(NO_ACCOUNT)) {
+      text += " - " + address;
+    }
+    return text;
+  }
+
+
 
   private void fail(String message) {
     AlertDialog.Builder alert = new AlertDialog.Builder(context);
