@@ -1,11 +1,7 @@
 package com.marionm.ngmw;
 
-import static com.marionm.ngmw.WidgetHelpers.getGmailIntent;
-
-import java.util.Map;
-
+import static com.marionm.ngmw.WidgetHelpers.*;
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetManager;
@@ -25,10 +21,6 @@ import android.widget.RemoteViews;
 
 //TODO: Probably want to expose the configuration separately as well, not just on 'widget add'
 public class Configuration extends Activity {
-  private static int NUM_ACCOUNTS = 4;
-  private static String PREFS = "com.marionm.ngmw.SHAREDPREFS";
-  private static String NO_ACCOUNT = "None";
-
   private int widgetId;
   private Configuration context;
 
@@ -54,14 +46,12 @@ public class Configuration extends Activity {
 
     ListView configurationList = (ListView)findViewById(R.id.config_list);
 
-    final SharedPreferences sharedPreferences = getSharedPreferences(PREFS, 0);
-    Map<String, ?> preferences = sharedPreferences.getAll();
+    final SharedPreferences preferences = getSharedPreferences(PREFS, 0);
 
     //Populate the configuration list with options
-    final String[] configurationArray = new String[NUM_ACCOUNTS];
-    for(int i = 0; i < NUM_ACCOUNTS; i++) {
-      configurationArray[i] = "Account " + (i + 1);
-      configurationArray[i] = accountSlotText(i, (String)preferences.get(slotKey(i)));
+    final String[] configurationArray = new String[ACCOUNT_SLOTS];
+    for(int i = 0; i < ACCOUNT_SLOTS; i++) {
+      configurationArray[i] = getAccountSlotText(i, preferences.getString(getSlotPrefKey(i), NO_ACCOUNT));
     }
     final ArrayAdapter<String> configurationAdapter = new ArrayAdapter<String>(context, R.layout.configuration_list_item, configurationArray);
     configurationList.setAdapter(configurationAdapter);
@@ -69,17 +59,13 @@ public class Configuration extends Activity {
     //Handle click events
     configurationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-        Map<String, ?> preferences = sharedPreferences.getAll();
-
-        final String slotId = slotKey(position);
-        String slotSelection = (String)preferences.get(slotId);
+        final String slotId = getSlotPrefKey(position);
+        String slotSelection = preferences.getString(slotId, NO_ACCOUNT);
         int slotSelectionIndex = 0;
-        if(slotSelection != null) {
-          for(int i = 0; i < accountAddresses.length; i++) {
-            if(slotSelection.equals(accountAddresses[i])) {
-              slotSelectionIndex = i;
-              break;
-            }
+        for(int i = 0; i < accountAddresses.length; i++) {
+          if(slotSelection.equals(accountAddresses[i])) {
+            slotSelectionIndex = i;
+            break;
           }
         }
 
@@ -89,11 +75,11 @@ public class Configuration extends Activity {
           public void onClick(final DialogInterface dialog, int which) {
             String selectedAddress = accountAddresses[which];
 
-            Editor editor = sharedPreferences.edit();
+            Editor editor = preferences.edit();
             editor.putString(slotId, selectedAddress);
             editor.commit();
 
-            configurationArray[position] = accountSlotText(position, selectedAddress);
+            configurationArray[position] = getAccountSlotText(position, selectedAddress);
             configurationAdapter.notifyDataSetChanged();
 
             //Let this method return before dismissing, so that the radio buttons refresh
@@ -141,8 +127,7 @@ public class Configuration extends Activity {
   }
 
   private void populateGmailAccounts() {
-    AccountManager accountManager = AccountManager.get(context);
-    accounts = accountManager.getAccountsByType("com.google");
+    accounts = getGmailAccounts(context);
     if(accounts.length == 0) {
       fail("No Gmail accounts found!");
     }
@@ -156,11 +141,7 @@ public class Configuration extends Activity {
 
 
 
-  private String slotKey(int slot) {
-    return "slot" + slot;
-  }
-
-  private String accountSlotText(int slot, String address) {
+  private String getAccountSlotText(int slot, String address) {
     String text = "Account " + (slot + 1);
     if(address != null && !address.equals(NO_ACCOUNT)) {
       text += " - " + address;

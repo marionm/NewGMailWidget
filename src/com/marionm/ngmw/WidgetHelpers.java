@@ -1,5 +1,8 @@
 package com.marionm.ngmw;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
 
 public class WidgetHelpers {
@@ -10,10 +13,24 @@ public class WidgetHelpers {
   private static String GMAIL_CLASS = GMAIL_PACKAGE + ".ConversationListActivity";
   private static int GMAIL_FLAGS = 0;
 
-  public static Intent getGmailIntent() {
+  protected static String PREFS = "com.marionm.ngmw.SHAREDPREFS";
+
+  protected static int ACCOUNT_SLOTS = 4;
+  protected static String NO_ACCOUNT = "None";
+
+  protected static Intent getGmailIntent() {
     Intent intent = new Intent(Intent.ACTION_MAIN);
     intent.setClassName(GMAIL_PACKAGE, GMAIL_CLASS);
     intent.setFlags(GMAIL_FLAGS);
     return intent;
+  }
+
+  protected static String getSlotPrefKey(int slot) {
+    return "slot" + slot;
+  }
+
+  protected static Account[] getGmailAccounts(Context context) {
+    AccountManager accountManager = AccountManager.get(context);
+    return accountManager.getAccountsByType("com.google");
   }
 }
